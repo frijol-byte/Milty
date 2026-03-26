@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
- 
+
 const FACTIONS = [
   { id: "arborec", name: "The Arborec", color: "#4a7c3f", tagline: "Living Forest of War", ability: "Mitosis: At the start of the status phase, place 1 infantry on any planet you control.", startingUnits: "1 Carrier, 1 Cruiser, 2 Fighters, 4 Infantry, 1 PDS, 1 Space Dock", startingTech: "Magen Defense Grid", homeSystem: "Nestphar (3/2)", commodities: 3, promissory: "Stymie: Place this card face-up in your play area when another player moves ships into a system that contains 1 or more of your ships.", flagshipName: "Duha Menaimon", flagshipStats: "Cost 8 | Combat 7(×2) | Move 1 | Capacity 5 — After you activate this system, you may produce up to 5 units in this system.", mechName: "Letani Behemoth", mechAbility: "After this unit is destroyed, roll 1 die; on 6+, place the unit on this card. At the start of your next turn, place it on a planet you control.", lore: "The Arborec are a vast sentient plant network spanning entire worlds. Each 'individual' is merely a node in a planetary consciousness that dreams in centuries and wages war with the patience of geology.", strengths: "Strong ground game, self-sustaining infantry production, excellent at holding territory", weaknesses: "Slow expansion, limited starting fleet, poor early game mobility", complexity: 2 },
   { id: "letnev", name: "The Barony of Letnev", color: "#8b1a1a", tagline: "Military Industrial Machine", ability: "Munitions Reserves: At the start of each round of space combat, you may spend 2 trade goods to re-roll any number of your dice.", startingUnits: "1 Dreadnought, 1 Carrier, 1 Destroyer, 1 Fighter, 3 Infantry, 1 Space Dock", startingTech: "Antimass Deflectors, Plasma Scoring", homeSystem: "Arc Prime (4/0), Wren Terra (2/1)", commodities: 2, promissory: "War Funding: After a player's destroyer or cruiser is destroyed, you may place 1 of your destroyers from your reinforcements in that system's space area.", flagshipName: "Arc Secundus", flagshipStats: "Cost 8 | Combat 5(×2) | Move 1 | Capacity 3 — Other players' units in this system lose PLANETARY SHIELD.", mechName: "Dunlain Reaper", mechAbility: "During combat against a player who has the most victory points, apply +2 to the result of each of this unit's combat rolls.", lore: "Beneath the frozen surface of Arc Prime, the Barony forges the mightiest warfleet the galaxy has ever known.", strengths: "Powerful combat rerolls, strong starting tech, versatile military", weaknesses: "Low commodities, trade-good hungry, needs economy to fuel war machine", complexity: 1 },
@@ -26,7 +26,7 @@ const FACTIONS = [
   { id: "empyrean", name: "The Empyrean", color: "#daa520", tagline: "Astral Merchants", ability: "Aetherpassage: Allow other players to move through your systems.", startingUnits: "2 Carriers, 1 Dreadnought, 2 Fighters, 3 Infantry, 1 Space Dock", startingTech: "Dark Energy Tap", homeSystem: "The Dark (3/4)", commodities: 4, promissory: "Blood Pact: After Empyrean loses a ship, you may place 1 of the same type.", flagshipName: "Dynamo", flagshipStats: "Cost 8 | Combat 5(×2) | Move 1 | Capacity 3 — Spend 2 influence to repair units using SUSTAIN DAMAGE.", mechName: "Watcher", mechAbility: "Spend 1 influence to place this unit on a planet you control when adjacent system is activated.", lore: "The Empyrean are beings of pure energy who traverse the astral plane.", strengths: "Strong home system, movement manipulation, diplomatic leverage", weaknesses: "Passive playstyle, relies on others' actions, complex timing", complexity: 3 },
   { id: "keleres", name: "The Council Keleres", color: "#b8860b", tagline: "Galactic Peacekeepers", ability: "Council Directive: Choose sub-faction (Mentak, Xxcha, or Argent). Gain their starting tech and abilities.", startingUnits: "2 Carriers, 1 Cruiser, 2 Fighters, 3 Infantry, 1 Space Dock", startingTech: "Varies by sub-faction chosen", homeSystem: "Varies by sub-faction chosen", commodities: 2, promissory: "Keleres Rider: Predict an agenda outcome; if correct, draw 1 secret objective.", flagshipName: "Artemiris", flagshipStats: "Cost 8 | Combat 7(×2) | Move 1 | Capacity 6 — Other players cannot use SUSTAIN DAMAGE.", mechName: "Omniorian Guard", mechAbility: "Hits must be assigned to non-mech ground forces if able.", lore: "The Council Keleres are the peacekeeping arm of the Galactic Council.", strengths: "Flexible sub-faction choice, peacekeeping bonuses, strong Agenda phase", weaknesses: "Low commodities, effectiveness depends on sub-faction choice", complexity: 3 },
 ];
- 
+
 // BLUE-BACKED: All planet tiles (cultural, industrial, AND hazardous) without anomalies
 const BLUE_TILES = [
   // Industrial
@@ -62,7 +62,7 @@ const BLUE_TILES = [
   { id: 61, planets: [{ name: "Kobadun", r: 1, i: 1 }, { name: "Londrak", r: 0, i: 4 }], trait: "cultural", back: "blue" },
   { id: 63, planets: [{ name: "Rigel III", r: 1, i: 1, techSkip: "biotic" }], trait: "industrial", back: "blue" },
 ];
- 
+
 // RED-BACKED: Anomalies and empty space ONLY (no planet-only tiles)
 const RED_TILES = [
   // Base game anomalies
@@ -88,7 +88,7 @@ const RED_TILES = [
   { id: 77, planets: [], anomaly: "empty", back: "red" },
   { id: 78, planets: [], anomaly: "empty", back: "red" },
 ];
- 
+
 const GALACTIC_EVENTS = [
   { name: "Wormhole Cascade", desc: "All wormholes are adjacent regardless of type for this round.", icon: "🌀", severity: "major" },
   { name: "Ion Storm", desc: "All ships receive -1 to combat rolls this round.", icon: "⚡", severity: "major" },
@@ -109,14 +109,14 @@ const GALACTIC_EVENTS = [
   { name: "Council of Whispers", desc: "Each player may look at 1 other player's secret objectives.", icon: "🕵️", severity: "major" },
   { name: "Void Incursion", desc: "Place 1 neutral dreadnought in a random empty system.", icon: "👾", severity: "catastrophic" },
 ];
- 
+
 function shuffle(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function getSliceSkips(tiles) { const skips = []; tiles.forEach(t => t.planets.forEach(p => { if (p.techSkip) skips.push(p.techSkip); })); return skips; }
- 
+
 const SKIP_COLORS = { biotic: "#22c55e", warfare: "#ef4444", propulsion: "#3b82f6", cybernetic: "#facc15" };
 const SKIP_SHORT = { biotic: "B", warfare: "W", propulsion: "P", cybernetic: "C" };
 const SEVERITY_COLORS = { minor: "#4ade80", moderate: "#facc15", major: "#f97316", catastrophic: "#ef4444" };
- 
+
 function buildSlice(blueTiles, redTiles, usedBlue, usedRed, index, minR, maxR, minI, maxI, maxAttempts = 300) {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const availBlue = shuffle(blueTiles.filter(t => !usedBlue.has(t.id)));
@@ -137,12 +137,12 @@ function buildSlice(blueTiles, redTiles, usedBlue, usedRed, index, minR, maxR, m
   const totalI = picked.reduce((s, t) => s + t.planets.reduce((ps, p) => ps + p.i, 0), 0);
   return { id: index + 1, tiles: picked, totalR, totalI, optimal: totalR + totalI, hasWormhole: picked.some(t => t.wormhole), hasAnomaly: picked.some(t => t.anomaly && t.anomaly !== "empty"), hasLegendary: picked.some(t => t.legendary), techSkips: getSliceSkips(picked), fallback: true };
 }
- 
+
 function StarField() {
   const stars = useMemo(() => Array.from({ length: 120 }, (_, i) => ({ id: i, x: Math.random() * 100, y: Math.random() * 100, size: Math.random() * 2.5 + 0.5, delay: Math.random() * 4, dur: Math.random() * 3 + 2, opacity: Math.random() * 0.5 + 0.3 })), []);
   return (<div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>{stars.map(s => (<div key={s.id} style={{ position: "absolute", left: `${s.x}%`, top: `${s.y}%`, width: s.size, height: s.size, borderRadius: "50%", background: "#fff", opacity: s.opacity, animation: `twinkle ${s.dur}s ease-in-out ${s.delay}s infinite alternate` }} />))}</div>);
 }
- 
+
 function NumberStepper({ label, value, onChange, min = 0, max = 20, color = "#94a3b8" }) {
   return (<div style={{ display: "flex", alignItems: "center", gap: 6 }}>
     <span style={{ fontSize: 11, color: "#94a3b8", fontFamily: "'Rajdhani', sans-serif", letterSpacing: 1, minWidth: 30 }}>{label}</span>
@@ -151,7 +151,7 @@ function NumberStepper({ label, value, onChange, min = 0, max = 20, color = "#94
     <button onClick={() => onChange(Math.min(max, value + 1))} style={{ width: 26, height: 26, borderRadius: 6, border: `1px solid ${color}33`, background: `${color}0a`, color, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
   </div>);
 }
- 
+
 function FactionModal({ faction, onClose }) {
   if (!faction) return null;
   const cx = ["", "Beginner", "Intermediate", "Advanced"];
@@ -187,7 +187,7 @@ function FactionModal({ faction, onClose }) {
     </div>
   );
 }
- 
+
 function SliceCard({ slice, index, drafted, draftedBy, onDraft, showDraft }) {
   const colors = ["#f97316", "#3b82f6", "#a855f7", "#22c55e", "#ef4444", "#eab308", "#ec4899", "#06b6d4", "#14b8a6"];
   const c = colors[index % colors.length];
@@ -242,7 +242,7 @@ function SliceCard({ slice, index, drafted, draftedBy, onDraft, showDraft }) {
     </div>
   );
 }
- 
+
 function FactionCard({ faction, onClick, drafted, draftedBy }) {
   return (
     <div onClick={drafted ? undefined : onClick} style={{ background: drafted ? "rgba(255,255,255,0.02)" : `linear-gradient(160deg, ${faction.color}12, #0f172a 70%)`, border: `1px solid ${drafted ? "rgba(255,255,255,0.08)" : faction.color + "44"}`, borderRadius: 12, padding: "14px 16px", cursor: drafted ? "default" : "pointer", transition: "all 0.2s", opacity: drafted ? 0.45 : 1, position: "relative", overflow: "hidden" }}
@@ -259,7 +259,7 @@ function FactionCard({ faction, onClick, drafted, draftedBy }) {
     </div>
   );
 }
- 
+
 function EventCard({ event }) {
   return (
     <div style={{ background: `linear-gradient(160deg, ${SEVERITY_COLORS[event.severity]}08, #0f172a 60%)`, border: `1px solid ${SEVERITY_COLORS[event.severity]}33`, borderRadius: 14, padding: 20, transition: "transform 0.2s" }}
@@ -272,7 +272,7 @@ function EventCard({ event }) {
     </div>
   );
 }
- 
+
 export default function TI4MiltyDraft() {
   const [playerCount, setPlayerCount] = useState(6);
   const [minR, setMinR] = useState(3); const [maxR, setMaxR] = useState(12);
@@ -287,7 +287,7 @@ export default function TI4MiltyDraft() {
   const [draftStarted, setDraftStarted] = useState(false);
   const [currentDraftPlayer, setCurrentDraftPlayer] = useState(1);
   const [genError, setGenError] = useState(null);
- 
+
   const generateDraft = useCallback(() => {
     setGenError(null);
     const numSlices = playerCount + 1;
@@ -306,12 +306,12 @@ export default function TI4MiltyDraft() {
       setEvents(shuffle(GALACTIC_EVENTS).slice(0, 3)); setActiveTab("slices");
     }
   }, [playerCount, minR, maxR, minI, maxI]);
- 
+
   const draftFaction = (f) => { if (draftedFactions[f.id]) return; setDraftedFactions(p => ({ ...p, [f.id]: `P${currentDraftPlayer}` })); setCurrentDraftPlayer(p => p < playerCount ? p + 1 : p); };
   const draftSlice = (id) => { if (draftedSlices[id]) return; setDraftedSlices(p => ({ ...p, [id]: `P${currentDraftPlayer}` })); setCurrentDraftPlayer(p => p < playerCount ? p + 1 : p); };
   const rollNewEvents = () => setEvents(shuffle(GALACTIC_EVENTS).slice(0, 3));
   const tabs = [{ id: "slices", label: "Map Slices", icon: "⬡" }, { id: "factions", label: "Faction Pool", icon: "⚔" }, { id: "events", label: "Galactic Events", icon: "🌌" }, { id: "all", label: "All Factions", icon: "📖" }];
- 
+
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(170deg, #030712 0%, #0c0a1e 30%, #0a0f1f 60%, #050a14 100%)", color: "#e2e8f0", position: "relative", fontFamily: "'Rajdhani', sans-serif" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital@0;1&family=Rajdhani:wght@300;400;500;600;700&display=swap');@keyframes twinkle{from{opacity:0.2}to{opacity:0.8}}@keyframes pulse{0%,100%{opacity:0.6}50%{opacity:1}}@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#334155 transparent}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}`}</style>

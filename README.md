@@ -6,9 +6,18 @@ A web-based Milty-style draft tool for **Twilight Imperium 4th Edition** (with P
 
 ### Map Slice Generator
 - Generates **N+1 slices** for the number of players selected (3–8)
-- Each slice shows 5 system tiles with total Resources, Influence, and combined value
+- Each slice is built from exactly **3 blue-backed tiles** (planet tiles — cultural, industrial, hazardous) and **2 red-backed tiles** (anomalies and empty space)
+- Configurable **per-slice resource and influence minimums/maximums** via stepper controls
+- Each slice summary shows total Resources, Influence, combined value, and **tech skip specialties** (Biotic, Warfare, Propulsion, Cybernetic)
 - Visual indicators for wormholes, anomalies, and legendary planets
-- Color-coded slice cards for easy differentiation
+- Red tiles with planets in anomalies (e.g. Cormund in nebula, Everra in asteroid field) display both planet stats and anomaly type
+- Color-coded tile composition dots (blue/red) on every slice card
+
+### Slice Drafting
+- Each slice has a **Draft Slice** button for players to claim
+- Drafting tracks which player claimed each slice
+- Status bar shows slice and faction draft progress
+- Drafted slices dim and display the drafting player
 
 ### Faction Draft Pool
 - Randomizes **N+3 factions** from all 24 base + PoK factions
@@ -30,6 +39,19 @@ A web-based Milty-style draft tool for **Twilight Imperium 4th Edition** (with P
 ### All Factions Reference
 - Complete browsable reference of all 24 factions
 - Click any faction for full detailed breakdown
+
+## Tile Classification
+
+Tiles are classified according to the official TI4 rules:
+
+| Back Color | Contains | Examples |
+|------------|----------|---------|
+| **Blue** | All planet tiles (cultural, industrial, hazardous) | Bereg/Lirta IV, Mecatol adjacents, tech skip planets |
+| **Red** | Anomalies (nebula, asteroid field, supernova, gravity rift) and empty space/frontier tiles | Also includes PoK anomaly-planet combos like Cormund (nebula) and Everra (asteroid field) |
+
+### Tile Counts
+- **28 blue-backed** planet tiles (supports up to 9 slices × 3 = 27 needed for 8 players)
+- **19 red-backed** anomaly/empty tiles (supports up to 9 slices × 2 = 18 needed for 8 players)
 
 ## Factions Included
 
@@ -76,13 +98,22 @@ Simply open `index.html` in any modern browser. No build step or server required
 
 ## How Milty Draft Works
 
-1. **Select player count** (3–8 players)
-2. **Generate Draft** — creates slices and faction pool
-3. Players draft in order, selecting:
-   - A **map slice** (their section of the galaxy)
-   - A **faction** from the randomized pool
-   - A **speaker order** position
-4. Use **Galactic Events** for optional house-rule flavor
+1. **Set player count** (3–8 players)
+2. **Configure R/I bounds** — set minimum and maximum resources/influence per slice
+3. **Generate Draft** — creates slices (3 blue + 2 red each) and faction pool
+4. Players draft in order, selecting:
+   - A **map slice** (their section of the galaxy) via the Draft Slice button
+   - A **faction** from the randomized pool via the Draft button
+   - A **speaker order** position (tracked externally)
+5. Use **Galactic Events** for optional house-rule flavor
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `index.html` | Standalone app for GitHub Pages (zero build step) |
+| `ti4-milty-draft.jsx` | React component source (for use in React projects) |
+| `README.md` | This file |
 
 ## License
 
